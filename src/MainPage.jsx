@@ -97,21 +97,33 @@ export default function MainPage({ query }) {
     });
   };
 
-  const generateRecommendations = (horse) => {
-    const pool = horses.filter((h) => h.Lot !== horse.Lot);
-    const recs = pool.filter(
-      (h) =>
-        h.Sire === horse.Sire ||
-        h.Dam === horse.Dam ||
-        h.Consignor === horse.Consignor
-    );
-    const chosen = (recs.length ? recs : pool)
-      .slice(0, 60)
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 3);
-    setExpandedId(horse.Lot);
-    setRecommendations(chosen);
-  };
+const generateRecommendations = (horse) => {
+  const pool = horses.filter((h) => h.Lot !== horse.Lot);
+
+  // Assign a match score based on how many fields match
+  const scored = pool.map((h) => {
+    let score = 0;
+    if (h.Sire === horse.Sire) score++;
+    if (h.Dam === horse.Dam) score++;
+    if (h.Consignor === horse.Consignor) score++;
+    if (h.Stabling === horse.Stabling) score++;
+    return { ...h, score };
+  });
+
+  // Sort by descending score, then randomize within same score group
+  const sorted = scored
+    .sort((a, b) => b.score - a.score || Math.random() - 0.5)
+    .filter((h) => h.score > 0); // keep only at least one match
+
+  // Take top 3 recommendations
+  const chosen = (sorted.length ? sorted : pool)
+    .slice(0, 3)
+    .map(({ score, ...rest }) => rest); // remove score before setting
+
+  setExpandedId(horse.Lot);
+  setRecommendations(chosen);
+};
+
 
   const handleRecommendationClick = (lot) => {
     setExpandedId(null);
