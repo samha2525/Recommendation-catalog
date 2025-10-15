@@ -216,6 +216,9 @@ const generateRecommendations = (horse) => {
                         <small>
                           <b>Dam:</b> {r.Dam}
                         </small>
+                         <small>
+                         <b>Consignor:</b> {r.Consignor || "—"}</small>
+    <small><b>Stabling:</b> {r.Stabling || "—"}</small>
                       </div>
                     </div>
                   ))}
