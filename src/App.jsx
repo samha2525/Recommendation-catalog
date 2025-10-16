@@ -3,6 +3,7 @@ import { useState } from "react";
 import Header from "./components/Header"; 
 import MainPage from "./MainPage";
 import FavoritesPage from "./FavoritesPage";
+import PricingPage from ".//components/PricingPage";
 import "./App.scss";
 
 export default function App() {
@@ -34,7 +35,7 @@ export default function App() {
             />
             <Route
               path="/pricing"
-              element={<div style={{ padding: "2rem" }}>Pricing Page</div>}
+             element={<PricingPage />}
             />
           </Routes>
         </main>

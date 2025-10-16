@@ -22,11 +22,12 @@ $white: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  width:calc(100% - 25px);
   gap: 1rem;
   position: relative;
   flex-wrap: wrap; /* ✅ Allows wrapping on tablets */
   overflow: visible;
+   margin-right: 6px;
 }
 
 /* ======= LOGO ======= */

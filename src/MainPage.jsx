@@ -229,7 +229,7 @@ export default function MainPage({ query: initialQuery = "" }) {
               {expandedId === h.Lot && (
                 <div className="rec-expanded">
                   <h4>Related Recommendations</h4>
-                  <div className="rec-inline-grid">
+                  <div className="rec-inline-grid horizontal">
                     {recommendations.map((r) => (
                       <div
                         className="rec-mini-card"

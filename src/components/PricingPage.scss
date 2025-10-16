@@ -1,0 +1,190 @@
+/* ============================
+   EQS Pricing Page — Premium Aligned Layout
+   ============================ */
+
+$cream-bg: #f8f1e3;
+$dark-brown: #3c2f2f;
+$choco-brown: #5a3825;
+$beige-border: #e9dcc5;
+$medium-brown: #7a4e2d;
+$white: #ffffff;
+$gold-accent: #caa974;
+
+.eqs-pricing {
+  background-color: $cream-bg;
+  color: $dark-brown;
+  padding: 5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+
+  .pricing-intro {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    .pricing-title {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: $dark-brown;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-subtitle {
+      font-size: 1.1rem;
+      color: $choco-brown;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+  }
+
+  .pricing-grid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: nowrap; /* ✅ all 3 in one row */
+    gap: 2rem;
+    max-width: 1100px;
+  }
+
+  .plan-card {
+    background: $white;
+    border: 1px solid $beige-border;
+    border-radius: 14px;
+    padding: 2rem 1.8rem;
+    text-align: left;
+    width: 340px;
+    box-shadow: 0 4px 12px rgba(60, 47, 47, 0.05);
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 6px 18px rgba(60, 47, 47, 0.12);
+      border-color: $gold-accent;
+    }
+
+    .plan-header {
+      margin-bottom: 1.5rem;
+
+      h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: $dark-brown;
+        margin: 0 0 0.3rem;
+      }
+
+      p {
+        color: $medium-brown;
+        font-size: 0.95rem;
+        margin: 0;
+      }
+    }
+
+    .plan-seats {
+      margin-bottom: 1.2rem;
+
+      .seat-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 0.35rem 0;
+        font-size: 0.95rem;
+
+        .seat-label {
+          color: $dark-brown;
+        }
+
+        .seat-price {
+          color: $choco-brown;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .plan-details {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 2rem;
+
+      li {
+        font-size: 0.9rem;
+        color: $dark-brown;
+        margin-bottom: 0.6rem;
+        position: relative;
+        padding-left: 1.3rem;
+
+        &::before {
+          content: "✓";
+          position: absolute;
+          left: 0;
+          top: 0;
+          color: $choco-brown;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .plan-select {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.5rem;
+
+      input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        accent-color: $choco-brown;
+        cursor: pointer;
+      }
+
+      .select-btn {
+        cursor: pointer;
+        background-color: $choco-brown;
+        color: $white;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.45rem 1rem;
+        transition: all 0.25s ease;
+
+        &:hover {
+          background-color: $medium-brown;
+          transform: translateY(-1px);
+        }
+      }
+    }
+
+    /* ✅ Middle card highlight */
+    &.professional {
+      border: 2px solid $choco-brown;
+      background-color: lighten($cream-bg, 8%);
+      transform: scale(1.04);
+    }
+  }
+
+  /* ============================
+     RESPONSIVE
+     ============================ */
+  @media (max-width: 1100px) {
+    .pricing-grid {
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (max-width: 900px) {
+    padding: 3rem 1.2rem;
+
+    .pricing-grid {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .plan-card {
+      width: 100%;
+      max-width: 380px;
+      transform: none !important;
+    }
+  }
+}

@@ -27,10 +27,10 @@ export default function Header() {
 
         {/* Navigation */}
         <nav className={`eqs-nav ${menuOpen ? "show" : ""}`}>
-          <NavLink to="/" className="nav-link">
+          <NavLink to="/home" className="nav-link">
             Home
           </NavLink>
-          <NavLink to="/database" className="nav-link">
+          <NavLink to="/" className="nav-link">
             Horse Database
           </NavLink>
           <NavLink to="/notes" className="nav-link">
