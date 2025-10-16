@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function MainPage({ query }) {
+export default function MainPage({ query: initialQuery = "" }) {
   const [horses, setHorses] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
@@ -8,6 +9,9 @@ export default function MainPage({ query }) {
   const [loading, setLoading] = useState(true);
   const [sortKey, setSortKey] = useState("Lot");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [query, setQuery] = useState(initialQuery);
+
+  const navigate = useNavigate();
 
   // Load horse data
   useEffect(() => {
@@ -97,33 +101,29 @@ export default function MainPage({ query }) {
     });
   };
 
-const generateRecommendations = (horse) => {
-  const pool = horses.filter((h) => h.Lot !== horse.Lot);
+  const generateRecommendations = (horse) => {
+    const pool = horses.filter((h) => h.Lot !== horse.Lot);
 
-  // Assign a match score based on how many fields match
-  const scored = pool.map((h) => {
-    let score = 0;
-    if (h.Sire === horse.Sire) score++;
-    if (h.Dam === horse.Dam) score++;
-    if (h.Consignor === horse.Consignor) score++;
-    if (h.Stabling === horse.Stabling) score++;
-    return { ...h, score };
-  });
+    const scored = pool.map((h) => {
+      let score = 0;
+      if (h.Sire === horse.Sire) score++;
+      if (h.Dam === horse.Dam) score++;
+      if (h.Consignor === horse.Consignor) score++;
+      if (h.Stabling === horse.Stabling) score++;
+      return { ...h, score };
+    });
 
-  // Sort by descending score, then randomize within same score group
-  const sorted = scored
-    .sort((a, b) => b.score - a.score || Math.random() - 0.5)
-    .filter((h) => h.score > 0); // keep only at least one match
+    const sorted = scored
+      .sort((a, b) => b.score - a.score || Math.random() - 0.5)
+      .filter((h) => h.score > 0);
 
-  // Take top 3 recommendations
-  const chosen = (sorted.length ? sorted : pool)
-    .slice(0, 3)
-    .map(({ score, ...rest }) => rest); // remove score before setting
+    const chosen = (sorted.length ? sorted : pool)
+      .slice(0, 3)
+      .map(({ score, ...rest }) => rest);
 
-  setExpandedId(horse.Lot);
-  setRecommendations(chosen);
-};
-
+    setExpandedId(horse.Lot);
+    setRecommendations(chosen);
+  };
 
   const handleRecommendationClick = (lot) => {
     setExpandedId(null);
@@ -136,97 +136,130 @@ const generateRecommendations = (horse) => {
   };
 
   return (
-    <section className="table-card full-table">
-      <div className="table-head sticky">
-        {[
-          { key: "Lot", label: "Lot / Name" },
-          { key: "Sex", label: "Sex" },
-          { key: "Colour", label: "Colour" },
-          { key: "Sire", label: "Sire" },
-          { key: "Dam", label: "Dam" },
-          { key: "Consignor", label: "Consignor" },
-          { key: "Price (gns)", label: "Price" },
-          { key: "Stabling", label: "Stabling" },
-        ].map((col) => (
-          <div
-            key={col.key}
-            className={`th sortable ${sortKey === col.key ? "active" : ""}`}
-            onClick={() => handleSort(col.key)}
-          >
-            {col.label}
-            {sortKey === col.key ? (
-              sortOrder === "asc" ? (
-                <span className="sort-icon up">↑</span>
-              ) : (
-                <span className="sort-icon down">↓</span>
-              )
-            ) : (
-              <span className="sort-icon faded">↕</span>
-            )}
-          </div>
-        ))}
-        <div className="th ta-right">Action</div>
+    <section className="table-wrapper">
+      {/* HEADER */}
+      <div className="header-bar">
+        <div className="header-left">
+          <h1 className="page-title">Horse Database</h1>
+          <p className="page-subtitle">
+            Search through our comprehensive database of 150,000+ horses
+          </p>
+        </div>
+
+        <div className="header-right">
+          <button className="btn favorites-btn" onClick={() => navigate("/favorites")}>
+            Favorites ⭐
+          </button>
+        </div>
       </div>
 
-      {!loading &&
-        sorted.map((h, idx) => (
-          <div
-            id={`row-${h.Lot}`}
-            className={`row ${idx % 2 ? "zebra" : ""}`}
-            key={h.Lot}
-          >
-            <div className="cell w-64">
-              <div className="lot">#{h.Lot}</div>
-              <div className="title">{h.Name}</div>
-            </div>
-            <div className="cell w-40">
-              <span className="chip subtle">{h.Sex || "—"}</span>
-            </div>
-            <div className="cell w-64">{h.Colour || "—"}</div>
-            <div className="cell w-72">{h.Sire || "—"}</div>
-            <div className="cell w-72">{h.Dam || "—"}</div>
-            <div className="cell w-80">{h.Consignor || "—"}</div>
-            <div className="cell w-36">{h["Price (gns)"] || "—"}</div>
-            <div className="cell w-40">{h.Stabling || "—"}</div>
-            <div className="cell ta-right">
-              <button
-                className={`btn save ${isFavorite(h.Lot) ? "active" : ""}`}
-                onClick={() => handleSaveClick(h)}
-              >
-                {isFavorite(h.Lot) ? "Saved" : "Save"}
-              </button>
-            </div>
+      {/* SEARCH BOX */}
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="🔍  Search by name, sire, dam, or consignor"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="search-input"
+        />
+      </div>
 
-            {expandedId === h.Lot && (
-              <div className="rec-expanded">
-                <h4>Related Recommendations</h4>
-                <div className="rec-inline-grid">
-                  {recommendations.map((r) => (
-                    <div
-                      className="rec-mini-card"
-                      key={r.Lot}
-                      onClick={() => handleRecommendationClick(r.Lot)}
-                    >
-                      <div className="rec-lot">#{r.Lot}</div>
-                      <div className="rec-name">{r.Name}</div>
-                      <div className="rec-info">
-                        <small>
-                          <b>Sire:</b> {r.Sire}
-                        </small>
-                        <small>
-                          <b>Dam:</b> {r.Dam}
-                        </small>
-                         <small>
-                         <b>Consignor:</b> {r.Consignor || "—"}</small>
-    <small><b>Stabling:</b> {r.Stabling || "—"}</small>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+      {/* TABLE */}
+      <section className="table-card full-table">
+        <div className="table-head sticky">
+          {[
+            { key: "Lot", label: "Lot / Name" },
+            { key: "Sex", label: "Sex" },
+            { key: "Colour", label: "Colour" },
+            { key: "Sire", label: "Sire" },
+            { key: "Dam", label: "Dam" },
+            { key: "Consignor", label: "Consignor" },
+            { key: "Price (gns)", label: "Price" },
+            { key: "Stabling", label: "Stabling" },
+          ].map((col) => (
+            <div
+              key={col.key}
+              className={`th sortable ${sortKey === col.key ? "active" : ""}`}
+              onClick={() => handleSort(col.key)}
+            >
+              {col.label}
+              {sortKey === col.key ? (
+                sortOrder === "asc" ? (
+                  <span className="sort-icon up">↑</span>
+                ) : (
+                  <span className="sort-icon down">↓</span>
+                )
+              ) : (
+                <span className="sort-icon faded">↕</span>
+              )}
+            </div>
+          ))}
+          <div className="th ta-right">Action</div>
+        </div>
+
+        {!loading &&
+          sorted.map((h, idx) => (
+            <div
+              id={`row-${h.Lot}`}
+              className={`row ${idx % 2 ? "zebra" : ""}`}
+              key={h.Lot}
+            >
+              <div className="cell w-64">
+                <div className="lot">#{h.Lot}</div>
+                <div className="title">{h.Name}</div>
               </div>
-            )}
-          </div>
-        ))}
+              <div className="cell w-40">
+                <span className="chip subtle">{h.Sex || "—"}</span>
+              </div>
+              <div className="cell w-64">{h.Colour || "—"}</div>
+              <div className="cell w-72">{h.Sire || "—"}</div>
+              <div className="cell w-72">{h.Dam || "—"}</div>
+              <div className="cell w-80">{h.Consignor || "—"}</div>
+              <div className="cell w-36">{h["Price (gns)"] || "—"}</div>
+              <div className="cell w-40">{h.Stabling || "—"}</div>
+              <div className="cell ta-right">
+                <button
+                  className={`btn save ${isFavorite(h.Lot) ? "active" : ""}`}
+                  onClick={() => handleSaveClick(h)}
+                >
+                  {isFavorite(h.Lot) ? "Saved" : "Save"}
+                </button>
+              </div>
+
+              {expandedId === h.Lot && (
+                <div className="rec-expanded">
+                  <h4>Related Recommendations</h4>
+                  <div className="rec-inline-grid">
+                    {recommendations.map((r) => (
+                      <div
+                        className="rec-mini-card"
+                        key={r.Lot}
+                        onClick={() => handleRecommendationClick(r.Lot)}
+                      >
+                        <div className="rec-lot">#{r.Lot}</div>
+                        <div className="rec-name">{r.Name}</div>
+                        <div className="rec-info">
+                          <small>
+                            <b>Sire:</b> {r.Sire}
+                          </small>
+                          <small>
+                            <b>Dam:</b> {r.Dam}
+                          </small>
+                          <small>
+                            <b>Consignor:</b> {r.Consignor || "—"}
+                          </small>
+                          <small>
+                            <b>Stabling:</b> {r.Stabling || "—"}
+                          </small>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+      </section>
     </section>
   );
 }
