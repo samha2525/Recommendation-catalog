@@ -11,24 +11,39 @@ export default function MainPage({ query: initialQuery = "" }) {
   const [sortOrder, setSortOrder] = useState("asc");
   const [query, setQuery] = useState(initialQuery);
 
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [limit] = useState(200); // adjust if needed
+  const [total, setTotal] = useState(0);
+
   const navigate = useNavigate();
 
-  // Load horse data
+  // ===== Load horse data with pagination =====
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/data/tattersalls.json");
-        const data = await res.json();
-        setHorses(Array.isArray(data) ? data : []);
+        setLoading(true);
+        const offset = page * limit;
+        const res = await fetch(
+          `http://127.0.0.1:8000/source_sales?limit=${limit}&offset=${offset}`
+        );
+        const result = await res.json();
+
+        if (Array.isArray(result.data)) {
+          setHorses((prev) =>
+            page === 0 ? result.data : [...prev, ...result.data]
+          );
+          setTotal(result.total || 0);
+        }
       } catch (e) {
         console.error("Error loading horse data:", e);
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [page, limit]);
 
-  // Load favorites from localStorage
+  // ===== Load favorites from localStorage =====
   useEffect(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -38,12 +53,12 @@ export default function MainPage({ query: initialQuery = "" }) {
     }
   }, []);
 
-  // Save favorites
+  // ===== Save favorites =====
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
 
-  // Auto close slider when clicking outside
+  // ===== Auto close slider when clicking outside =====
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(".rec-expanded") && !e.target.closest(".btn.save")) {
@@ -135,6 +150,29 @@ export default function MainPage({ query: initialQuery = "" }) {
     }
   };
 
+  // ===== Spinner component (Dark Brown) =====
+  const Spinner = () => (
+    <div style={{ textAlign: "center", padding: "2rem" }}>
+      <div
+        style={{
+          border: "4px solid #f8f1e3",
+          borderTop: "4px solid #3c2f2f",
+          borderRadius: "50%",
+          width: "38px",
+          height: "38px",
+          animation: "spin 1s linear infinite",
+          margin: "0 auto",
+        }}
+      ></div>
+      <style>
+        {`@keyframes spin { 
+          0% { transform: rotate(0deg); } 
+          100% { transform: rotate(360deg); } 
+        }`}
+      </style>
+    </div>
+  );
+
   return (
     <section className="table-wrapper">
       {/* HEADER */}
@@ -147,7 +185,10 @@ export default function MainPage({ query: initialQuery = "" }) {
         </div>
 
         <div className="header-right">
-          <button className="btn favorites-btn" onClick={() => navigate("/favorites")}>
+          <button
+            className="btn favorites-btn"
+            onClick={() => navigate("/favorites")}
+          >
             Favorites ⭐
           </button>
         </div>
@@ -179,7 +220,9 @@ export default function MainPage({ query: initialQuery = "" }) {
           ].map((col) => (
             <div
               key={col.key}
-              className={`th sortable ${sortKey === col.key ? "active" : ""}`}
+              className={`th sortable ${
+                sortKey === col.key ? "active" : ""
+              }`}
               onClick={() => handleSort(col.key)}
             >
               {col.label}
@@ -197,7 +240,9 @@ export default function MainPage({ query: initialQuery = "" }) {
           <div className="th ta-right">Action</div>
         </div>
 
-        {!loading &&
+        {loading && page === 0 ? (
+          <Spinner />
+        ) : (
           sorted.map((h, idx) => (
             <div
               id={`row-${h.Lot}`}
@@ -219,7 +264,9 @@ export default function MainPage({ query: initialQuery = "" }) {
               <div className="cell w-40">{h.Stabling || "—"}</div>
               <div className="cell ta-right">
                 <button
-                  className={`btn save ${isFavorite(h.Lot) ? "active" : ""}`}
+                  className={`btn save ${
+                    isFavorite(h.Lot) ? "active" : ""
+                  }`}
                   onClick={() => handleSaveClick(h)}
                 >
                   {isFavorite(h.Lot) ? "Saved" : "Save"}
@@ -258,8 +305,25 @@ export default function MainPage({ query: initialQuery = "" }) {
                 </div>
               )}
             </div>
-          ))}
+          ))
+        )}
       </section>
+
+      {/* Load More Button */}
+      {!loading && horses.length < total && (
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <button
+            className="btn save"
+            onClick={() => setPage((prev) => prev + 1)}
+            style={{ fontSize: "1rem", padding: "0.6rem 1.4rem" }}
+          >
+            {loading ? "Loading..." : `Load More (${horses.length}/${total})`}
+          </button>
+        </div>
+      )}
+
+      {/* Spinner for “loading next page” */}
+      {loading && page > 0 && <Spinner />}
     </section>
   );
 }
