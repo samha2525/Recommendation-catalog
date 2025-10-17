@@ -313,68 +313,124 @@ body {
 }
 
 /* ============================
-   RECOMMENDATIONS
+   RECOMMENDATIONS - ENHANCED STYLE
    ============================ */
 .rec-expanded {
-  background-color: lighten($cream-bg, 3%);
-  border-top: 1px solid $beige-border;
-  padding: 1rem 1.25rem;
+  grid-column: 1 / -1;
+  width: 100%;
+  background: linear-gradient(135deg, #f4e8d6 0%, #f8f1e3 100%);
+  border-top: 2px solid rgba(90, 56, 37, 0.15);
+  box-shadow: inset 0 4px 8px rgba(90, 56, 37, 0.12);
+  padding: 0.4rem 1.4rem 1.7rem; /* ⬅ reduced vertical padding */
+  margin-top: 0.4rem;
+  box-sizing: border-box;
+  animation: fadeInRec 0.4s ease-in-out;
+  position: relative;
+  z-index: 1;
+
 
   h4 {
-    color: $choco-brown;
-    margin-bottom: 0.8rem;
+    font-family: "Poppins", "Inter", "Segoe UI", sans-serif;
+    font-size: 1.25rem;
     font-weight: 600;
+    color: #3a2c22; /* slightly softer brown for refinement */
+    text-transform: none; /* sentence case for natural flow */
+    letter-spacing: 0.02em;
+    margin: 0.2rem 0 1rem;
+    line-height: 1.3;
   }
 
-  /* ✅ Horizontal layout */
+
   .rec-inline-grid {
     display: flex;
-    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
     gap: 1.2rem;
+    flex-wrap: nowrap;
     overflow-x: auto;
     scroll-behavior: smooth;
+    padding: 0.3rem 0; /* reduced padding inside */
+    width: 100%;
 
     &::-webkit-scrollbar {
-      height: 8px;
+      height: 7px;
     }
     &::-webkit-scrollbar-thumb {
-      background: #c9b39a;
-      border-radius: 4px;
+      background-color: rgba(90, 56, 37, 0.35);
+      border-radius: 6px;
     }
   }
 
+  /* 💎 Compact recommendation cards */
   .rec-mini-card {
-    background-color: $white;
-    border: 1px solid $beige-border;
-    border-radius: 8px;
-    padding: 0.8rem;
-    flex: 0 0 240px;
+    flex: 0 0 280px; /* ⬅ slightly smaller width */
+    background: linear-gradient(145deg, #ffffff, #f7eddf);
+    border-radius: 10px;
+    padding: 1rem 1.2rem; /* ⬅ smaller internal padding */
+    border: 1px solid rgba(233, 220, 197, 0.7);
+    box-shadow: 0 3px 8px rgba(90, 56, 37, 0.12);
+    transition: all 0.25s ease;
     cursor: pointer;
-    transition: 0.2s ease;
+    position: relative;
 
     &:hover {
-      background-color: lighten($beige-border, 15%);
-      transform: translateY(-2px);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 10px 22px rgba(90, 56, 37, 0.25);
+      background: linear-gradient(145deg, #fffaf4, #f9efdd);
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 100%;
+      background: linear-gradient(90deg, #c9a36a 0%, #7a4e2d 90%);
+      border-radius: 2px;
+      box-shadow: 0 2px 6px rgba(122, 78, 45, 0.25);
+    }
+
+    &:hover:after {
+      border-color: rgba(122, 78, 45, 0.4);
+      box-shadow: 0 0 10px rgba(122, 78, 45, 0.25);
     }
 
     .rec-lot {
+      font-weight: 700;
       color: $choco-brown;
-      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
     }
 
     .rec-name {
-      font-size: 0.95rem;
+      font-weight: 700;
       color: $dark-brown;
-      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+      margin-bottom: 0.6rem;
     }
 
     .rec-info small {
       display: block;
-      color: $dark-brown;
+      color: darken($dark-brown, 8%);
       font-size: 0.8rem;
+      line-height: 1.4;
     }
   }
 }
+
+/* Animation */
+@keyframes fadeInRec {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 /* ============================
    RESPONSIVE
