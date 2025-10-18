@@ -2,10 +2,10 @@ services:
   - type: web
     name: tattersalls-api
     env: python
-    runtime: python3.10            # ✅ ensures a modern Python environment
+    runtime: python3.10
     plan: free
     buildCommand: |
-      pip install --upgrade pip    # ✅ upgrade pip first
+      pip install --upgrade pip
       pip install -r requirements.txt
       echo "=== Checking uvicorn path & version ==="
       which uvicorn || echo "uvicorn not found in PATH"
