@@ -10,7 +10,7 @@ services:
       echo "=== Checking uvicorn path & version ==="
       which uvicorn || echo "uvicorn not found in PATH"
       python -m uvicorn --version || echo "python -m uvicorn failed"
-    startCommand: "python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+   startCommand: uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
     envVars:
       - key: DB_HOST
         sync: false
