@@ -1,16 +1,21 @@
 services:
   - type: web
-    name: tattersalls-api
+    name: eqs-sandbox
     env: python
     runtime: python3.10
     plan: free
+    autoDeploy: true
+
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
-      echo "=== Checking uvicorn path & version ==="
-      which uvicorn || echo "uvicorn not found in PATH"
-      python -m uvicorn --version || echo "python -m uvicorn failed"
-    startCommand: python -c "import os; from uvicorn import run; run('main:app', host='0.0.0.0', port=int(os.environ['PORT']))"
+      echo "=== Verifying uvicorn installation ==="
+      which uvicorn || echo "⚠️ uvicorn not found!"
+      python -m uvicorn --version || echo "⚠️ uvicorn check failed!"
+
+    # ✅ This ensures $PORT expands correctly in Render
+    startCommand: bash -c "exec uvicorn main:app --host 0.0.0.0 --port ${PORT}"
+
     envVars:
       - key: DB_HOST
         sync: false
