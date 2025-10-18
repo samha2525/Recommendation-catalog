@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import API_BASE_URL from "./config";
 export default function MainPage({ query: initialQuery = "" }) {
   const [horses, setHorses] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
@@ -25,8 +25,8 @@ export default function MainPage({ query: initialQuery = "" }) {
         setLoading(true);
         const offset = page * limit;
         const res = await fetch(
-          `http://127.0.0.1:8000/source_sales?limit=${limit}&offset=${offset}`
-        );
+  `${API_BASE_URL}/source_sales?limit=${limit}&offset=${offset}`
+);
         const result = await res.json();
 
         if (Array.isArray(result.data)) {
